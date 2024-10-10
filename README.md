@@ -38,7 +38,7 @@ The code includes functions to:
 
 # How to Run
 1. **Clone the repository** (or download the files):
-- git clone git@github.com:katrina-l-hill/ieee_754.git
+- git clone git@github.com/katrina-l-hill/ieee_754.git
 - cd into the repository directory
 2. **Run the Main program**:
 - run python `ieee754_fpn.py` to run the program

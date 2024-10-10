@@ -1,14 +1,19 @@
 def decimal_to_ieee754_32bit(decimal_number):
+    import math
 
-    # Handle the sign bit
+    # Handle special cases
+    if math.isnan(decimal_number):
+        return '01111111110000000000000000000000'  # NaN
+    if math.isinf(decimal_number):
+        return '01111111100000000000000000000000' if decimal_number > 0 else '11111111100000000000000000000000'
+    if decimal_number == 0.0:
+        return '10000000000000000000000000000000' if str(decimal_number).startswith('-') else '00000000000000000000000000000000'
+
+    # Determine the sign bit
     sign_bit = '1' if decimal_number < 0 else '0'
     decimal_number = abs(decimal_number)
 
-    # Handle zero case
-    if decimal_number == 0.0:
-        return sign_bit + '00000000' + '00000000000000000000000'
-
-    # Normalize the number to the range [1, 2) by shifting (for exponent calculation)
+    # Normalize the number
     exponent = 0
     if decimal_number >= 2:
         while decimal_number >= 2:
@@ -19,11 +24,10 @@ def decimal_to_ieee754_32bit(decimal_number):
             decimal_number *= 2
             exponent -= 1
 
-    # IEEE 754 bias for 32-bit floating point (127)
-    exponent_bits = f'{(exponent + 127):08b}'
+    # Calculate the exponent with the bias of 127
+    exponent_bits = bin(exponent + 127)[2:].zfill(8)
 
-    # Now we have the normalized number in the form 1.xxxx
-    # We remove the leading 1 and keep the fraction part as mantissa
+    # Calculate the mantissa
     decimal_number -= 1  # Remove the leading 1
     mantissa_bits = ''
     for _ in range(23):
@@ -34,7 +38,7 @@ def decimal_to_ieee754_32bit(decimal_number):
         else:
             mantissa_bits += '0'
 
-    # Combine sign bit, exponent bits, and mantissa bits
+    # Combine the sign bit, exponent, and mantissa
     ieee754_representation = sign_bit + exponent_bits + mantissa_bits
-    return ieee754_representation
 
+    return ieee754_representation

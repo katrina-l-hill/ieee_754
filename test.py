@@ -1,4 +1,5 @@
-from ieee754_fpn import decimal_to_ieee754_32bit, ieee754_arithmetic_ops
+import math
+from ieee754_fpn import decimal_to_ieee754_32bit, ieee754_arithmetic_ops, ieee754_special_values, rounding_modes
 
 def test_normal_cases():
     """
@@ -39,3 +40,57 @@ def test_ieee754_arithmetic_ops():
     
     assert div_cd_ieee == expected_div_cd, \
         f"Test failed for div_cd_ieee: expected {expected_div_cd}, got {div_cd_ieee}"
+
+def test_ieee754_special_values():
+    """
+    Test special IEEE 754 values: Positive Infinity, Negative Infinity, and NaN.
+    """
+    pos_inf, neg_inf, nan = ieee754_special_values()
+
+    # Test Positive Infinity
+    assert pos_inf == float('inf'), \
+        f"Test failed for Positive Infinity: expected {float('inf')}, got {pos_inf}"
+
+    # Test Negative Infinity
+    assert neg_inf == float('-inf'), \
+        f"Test failed for Negative Infinity: expected {float('-inf')}, got {neg_inf}"
+
+    # Test NaN
+    assert (nan != nan), \
+        "Test failed for NaN: expected NaN, got a value equal to itself, which should not happen in NaN."
+
+test_ieee754_special_values()
+
+def test_rounding_modes():
+    test_cases = [
+        # Test ROUND_UP (ceil) – round towards positive infinity
+        (2.5, math.ceil(2.5), "ROUND_UP"), 
+        
+        # Test ROUND_DOWN (floor) – round towards negative infinity
+        (2.5, math.floor(2.5), "ROUND_DOWN"), 
+        
+        # Test ROUND_ZERO (trunc) – round towards zero
+        (2.5, math.trunc(2.5), "ROUND_ZERO"),
+        
+        # Test ROUND_NEAREST (round) – round to nearest integer
+        (2.5, round(2.5), "ROUND_NEAREST")
+    ]
+    
+    for number, expected_result, mode in test_cases:
+        # Perform the rounding operation based on the mode
+        result = None
+        if mode == "ROUND_UP":
+            result = math.ceil(number)
+        elif mode == "ROUND_DOWN":
+            result = math.floor(number)
+        elif mode == "ROUND_ZERO":
+            result = math.trunc(number)
+        elif mode == "ROUND_NEAREST":
+            result = round(number)
+        
+        # Assert if the result is correct
+        assert result == expected_result, \
+            f"Test failed for {mode} mode with {number}: expected {expected_result}, got {result}"
+
+test_rounding_modes()
+
